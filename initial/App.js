@@ -1,20 +1,9 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { View } from "react-native";
+import WelcomeScreen from "./app/screens/WelcomeScreen";
+import ViewImageScreen from "./app/screens/ViewImageScreen";
 
+//GO TO THIS LINK TO FIND API FOR ALL THESE THINGS LIKE BUTTON, IMAGE WHATEVER https://reactnative.dev/docs/appregistry
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>YESSSS</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <WelcomeScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
