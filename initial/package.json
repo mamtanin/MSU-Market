@@ -1,5 +1,5 @@
 {
-  "name": "inital",
+  "name": "initial",
   "license": "0BSD",
   "version": "1.0.0",
   "main": "index.js",
@@ -18,7 +18,8 @@
     "react-native-web": "~0.19.13"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@react-native-community/cli": "^15.1.2"
   },
   "private": true
 }

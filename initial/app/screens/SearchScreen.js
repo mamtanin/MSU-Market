@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useEffect } from 'react';
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(DATA);
   const [suggestions, setSuggestions] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  useEffect(() => {
+    filterData('All', ''); // Apply the "All" filter on load
+  }, []);
 
   const DATA = [
-    { id: '1', name: 'Microwave', category: 'Appliances' },
-    { id: '2', name: 'Airpods', category: 'Electronics' },
-    { id: '3', name: 'Bean Bag', category: 'Furniture' },
-    { id: '4', name: 'Sparty Poster', category: 'Decor' },
-    { id: '5', name: 'Hoodie', category: 'Clothing' },
-    { id: '6', name: 'Mini Fridge', category: 'Appliances', },
-    { id: '7', name: 'Desk Lamp', category: 'Appliances', },
-    { id: '8', name: 'Fan', category: 'Appliances', },
-    { id: '9', name: 'MSU T-Shirt', category: 'Clothing', },
-    { id: '10', name: 'Office Chair', category: 'Furniture', },
-    { id: '11', name: 'Gaming Rig', category: 'Electronics', }
+    { id: '1', name: 'Microwave', category: 'Appliances', price: '$50', seller: 'John Doe' ,image: require('../assets/MSUMarket microwave.webp') },
+    { id: '2', name: 'Airpods', category: 'Electronics', price: '$80', seller: 'Tom Cruise' ,image: require('../assets/MSUMarket airpods.webp')  },
+    { id: '3', name: 'Bean Bag', category: 'Furniture', price: '$30', seller: 'Gordon Ramsay' ,image: require('../assets/MSUMarket beanbag.jpg')  },
+    { id: '4', name: 'Sparty Poster', category: 'Decor', price: '$10', seller: 'Joe Biden' ,image: require('../assets/MSUMarket sparty poster.jpg')  },
+    { id: '5', name: 'Hoodie', category: 'Clothing', price: '$20', seller: 'LeBron James' ,image: require('../assets/MSUMarket hoodie.jpg')  },
+    { id: '6', name: 'Mini Fridge', category: 'Appliances', price: '$50', seller: 'Tim Cook' ,image: require('../assets/MSUMarket mini fridge.webp')  },
+    { id: '7', name: 'Desk Lamp', category: 'Appliances', price: '$15', seller: 'Joshua Nahum' ,image: require('../assets/MSUMarket desk lamp.webp')  },
+    { id: '8', name: 'Fan', category: 'Appliances', price: '$20', seller: 'Mark Zuckerberg' ,image: require('../assets/MSUMarket fan.webp')  },
+    { id: '9', name: 'MSU T-Shirt', category: 'Clothing', price: '$10', seller: 'John Smith' ,image: require('../assets/MSUMarket shirt.webp')  },
+    { id: '10', name: 'Office Chair', category: 'Furniture', price: '$50', seller: 'Toby Maguire' ,image: require('../assets/MSUMarket office chair.webp')  },
+    { id: '11', name: 'Gaming Rig', category: 'Electronics', price: '$400', seller: 'Lionel Messi' ,image: require('../assets/MSUMarket gaming rig.webp')  }
   ];
 
   const CATEGORIES = ['All', 'Appliances', 'Electronics', 'Furniture', 'Decor', "Clothing"];
@@ -63,13 +69,31 @@ const SearchScreen = () => {
     filterData(category, searchQuery);
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
+  };
+
   const renderSuggestion = ({ item }) => (
     <TouchableOpacity onPress={() => setSearchQuery(item.name)}>
       <Text style={styles.suggestionItem}>{item.name}</Text>
     </TouchableOpacity>
   );
 
-  const renderItem = ({ item }) => <Text style={styles.item}>{item.name}</Text>;
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      {/* Item Name */}
+      <Text style={styles.cardTitle}>{item.name}</Text>
+  
+      {/* Item Image */}
+      <Image source={item.image} style={styles.cardImage} />
+  
+      {/* Seller and Price */}
+      <View style={styles.cardDetails}>
+        <Text style={styles.cardSeller}>Seller: {item.seller}</Text>
+        <Text style={styles.cardPrice}>{item.price}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -102,7 +126,15 @@ const SearchScreen = () => {
       {/* Divider with Shadow */}
       <View style={styles.divider} />
 
-      {/* Category Tabs */}
+      {/* Dropdown Toggle Button */}
+      <TouchableOpacity onPress={toggleDropdown} style={styles.dropdownButton}>
+        <Text style={styles.dropdownButtonText}>
+          {isDropdownVisible ? 'Hide Categories' : 'Show Categories'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Category Dropdown*/}
+      {isDropdownVisible && (
       <View style={styles.categoryContainer}>
         {CATEGORIES.map((category) => (
           <TouchableOpacity
@@ -124,6 +156,7 @@ const SearchScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+      )}
 
       {/* Filtered Results */}
       <FlatList
@@ -160,6 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingHorizontal: 8,
     borderRadius: 24,
+    backgroundColor: '#e8eceb',
   },
   suggestionsDropdown: {
     backgroundColor: '#fff',
@@ -185,13 +219,25 @@ const styles = StyleSheet.create({
     shadowRadius: 2, // Shadow blur
     elevation: 2, // Shadow for Android
   },
+  dropdownButton: {
+    marginHorizontal: 16,
+    padding: 12,
+    backgroundColor: '#18453b',
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  dropdownButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   categoryContainer: {
     marginHorizontal: 16,
     marginBottom: 16,
   },
   categoryTab: {
     padding: 16,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#d1dad8',
     borderRadius: 16,
     marginBottom: 8,
     borderWidth: 1,
@@ -207,6 +253,44 @@ const styles = StyleSheet.create({
   },
   activeCategoryText: {
     color: '#fff',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // For Android shadow
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  cardImage: {
+    width: '100%',
+    height: 300,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  cardDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  cardSeller: {
+    fontSize: 14,
+    color: '#555',
+  },
+  cardPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#18453b',
   },
   item: {
     padding: 16,
