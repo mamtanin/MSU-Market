@@ -77,7 +77,7 @@ const SearchScreen = () => {
       <View style={styles.header}>
         <Image
           style={styles.headerImage}
-          source={{ uri: 'https://via.placeholder.com/50' }} // Placeholder image
+          source={require("../assets/icon.png")} // Placeholder image
         />
       </View>
 
@@ -98,6 +98,9 @@ const SearchScreen = () => {
           style={styles.suggestionsDropdown}
         />
       )}
+
+      {/* Divider with Shadow */}
+      <View style={styles.divider} />
 
       {/* Category Tabs */}
       <View style={styles.categoryContainer}>
@@ -171,6 +174,16 @@ const styles = StyleSheet.create({
     padding: 8,
     borderBottomColor: '#eee',
     borderBottomWidth: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 10,
+    shadowColor: '#000', // Shadow for iOS
+    shadowOffset: { width: 0, height: 2 }, // Shadow position
+    shadowOpacity: 0.2, // Shadow intensity
+    shadowRadius: 2, // Shadow blur
+    elevation: 2, // Shadow for Android
   },
   categoryContainer: {
     marginHorizontal: 16,
