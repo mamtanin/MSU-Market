@@ -14,21 +14,75 @@ import { LinearGradient } from "expo-linear-gradient";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   // Dynamic logo size
   const screenWidth = Dimensions.get("window").width;
   const logoSize = screenWidth * 0.4;
 
-  const handleLogin = () => {
+  const validateInput = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter both email and password");
-      return;
+      return false;
     }
 
-    if (email === "user@example.com" && password === "password123") {
-      navigation.navigate("Welcome");
-    } else {
-      Alert.alert("Error", "Invalid email or password");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return false;
+    }
+
+    if (password.length < 8) {
+      Alert.alert("Error", "Password must be at least 8 characters long");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateInput()) return;
+
+    setIsLoading(true);
+
+    try {
+      const endpoint = isSignUp ? "signup" : "login";
+      const response = await fetch(`http://127.0.0.1:5001/${endpoint}`, {
+        // Replace with your IP
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (isSignUp) {
+          Alert.alert(
+            "Success",
+            "Account created successfully! Please log in."
+          );
+          setIsSignUp(false);
+        } else {
+          navigation.navigate("Welcome");
+        }
+      } else {
+        Alert.alert("Error", data.error || "Something went wrong");
+      }
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        "Unable to connect to the server. Please check your internet connection."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,7 +99,9 @@ const Login = ({ navigation }) => {
             style={[styles.logo, { width: logoSize, height: logoSize }]}
             resizeMode="contain"
           />
-          <Text style={styles.title}>Spartan Login</Text>
+          <Text style={styles.title}>
+            {isSignUp ? "Create Account" : "Spartan Login"}
+          </Text>
         </View>
 
         {/* Email Input */}
@@ -58,6 +114,7 @@ const Login = ({ navigation }) => {
             onChangeText={setEmail}
             keyboardType="email-address"
             placeholderTextColor="#ffffff90"
+            autoCapitalize="none"
           />
         </View>
 
@@ -74,21 +131,39 @@ const Login = ({ navigation }) => {
           />
         </View>
 
-        {/* Forgot Password */}
-        <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        {/* Forgot Password - Only show on login */}
+        {!isSignUp && (
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Submit Button */}
+        <TouchableOpacity
+          style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+          onPress={handleSubmit}
+          disabled={isLoading}
+        >
+          <Text style={styles.loginButtonText}>
+            {isLoading
+              ? isSignUp
+                ? "Creating Account..."
+                : "Logging in..."
+              : isSignUp
+              ? "Create Account"
+              : "Login"}
+          </Text>
         </TouchableOpacity>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-
-        {/* Sign Up Prompt */}
+        {/* Toggle Sign Up/Login */}
         <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't have an account? </Text>
-          <TouchableOpacity>
-            <Text style={styles.signUpLink}>Sign Up</Text>
+          <Text style={styles.signUpText}>
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
+          </Text>
+          <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
+            <Text style={styles.signUpLink}>
+              {isSignUp ? "Log In" : "Sign Up"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -152,6 +227,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
+  },
+  loginButtonDisabled: {
+    opacity: 0.7,
   },
   signUpContainer: {
     flexDirection: "row",
