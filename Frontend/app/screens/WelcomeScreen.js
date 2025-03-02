@@ -13,11 +13,11 @@ function WelcomeScreen(props) {
   return (
     <ImageBackground
       style={styles.background}
-      source={require("../assets/background.jpg")}
+      source={require("../assets/hoodie.png")}
     >
       {" "}
       <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={require("../assets/icon.png")} />
+        <Image style={styles.logo} source={require("../assets/hoodie.png")} />
         <Text> Sell what you dont need </Text>
         <Button
           color="blue"
